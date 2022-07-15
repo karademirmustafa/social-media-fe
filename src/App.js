@@ -20,7 +20,7 @@ async function handleSubmit(e,password,username){
     }
   }
   await axios(config).then(res=>console.log(res.data))
-
+console.log("asd")
 }
 
 
