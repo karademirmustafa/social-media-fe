@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Push to Docker
+        env:
+          HEROKU_APP_NAME: ${{secrets.APP_NAME}}
+          HEROKU_EMAIL: ${{secrets.HEROKU_EMAIL}}
+          HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
+        run: |
+          docker login --username=${HEROKU_EMAIL} registry.heroku.com --password-stdin
+          docker build --tag registry.heroku.com/${HEROKU_APP_NAME}/web .
+          heroku container:push web --app ${HEROKU_APP_NAME}
+          heroku container:release web --app ${HEROKU_APP_NAME}
